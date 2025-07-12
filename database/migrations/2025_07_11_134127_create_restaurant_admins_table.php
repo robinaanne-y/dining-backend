@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('restaurant_admins', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('dining_table_id')
+            $table->foreignId('restaurant_id')
                 ->constrained()
                 ->cascadeOnDelete();
             $table->foreignId('user_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->string('status');
-            $table->decimal('total_price');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('restaurant_admins');
     }
 };
