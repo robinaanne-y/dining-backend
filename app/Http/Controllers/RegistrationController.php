@@ -17,13 +17,14 @@ class RegistrationController extends Controller
      */
     public function register(RegisterUserRequest $request)
     {
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type,
             'phone_number' => $request->phone_number,
-            'is_guest' => false,
+            'is_guest' => $request->is_guest ? 1 : 0
         ]);
 
         return response()->json(['user' => $user], 201);
