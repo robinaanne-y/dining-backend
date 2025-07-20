@@ -23,7 +23,7 @@ class RestaurantPolicy
 
     public function show(User $user, Restaurant $restaurant) : bool
     {
-        return $this->userRepository->isAdmin($user) && $restaurant->user_id === $user->id;
+        return $this->userRepository->isOwner($user) && $restaurant->user_id === $user->id;
     }
     
     /**
@@ -33,11 +33,11 @@ class RestaurantPolicy
      */
     public function create(User $user) : bool
     {
-        return $this->userRepository->isAdmin($user);
+        return $this->userRepository->isOwner($user);
     }
 
     public function update(User $user, Restaurant $restaurant) : bool
     {
-        return ($this->userRepository->isAdmin($user) && $restaurant->user_id === $user->id);
+        return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
     }
 }

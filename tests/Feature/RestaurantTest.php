@@ -14,11 +14,12 @@ class RestaurantTest extends TestCase
     use RefreshDatabase, WithFaker;
 
     /** @test */
-    public function admin_can_register_a_restaurant(): void
+    public function owner_can_register_a_restaurant(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
+        
         $this->actingAs($user);
         $response = $this->post('/api/restaurants', Restaurant::factory()->make([
             'user_id' => $user->id
@@ -27,15 +28,15 @@ class RestaurantTest extends TestCase
         
         $response->assertStatus(201);
         $this->assertDatabaseHas('restaurants', [
-            'user_id' => 1,
+            'user_id' => $user->id,
         ]);
     }
 
     /** @test */
-    public function unauthenticated_admin_cannot_register_a_restaurant(): void
+    public function unauthenticated_owner_cannot_register_a_restaurant(): void
     {   
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $response = $this->post('/api/restaurants', Restaurant::factory()->make([
             'user_id' => $user->id
@@ -67,10 +68,10 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_update_a_restaurant(): void
+    public function owner_can_update_a_restaurant(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $this->actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
@@ -88,10 +89,10 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function unauthenticated_admin_cannot_update_a_restaurant(): void
+    public function unauthenticated_owner_cannot_update_a_restaurant(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
@@ -111,17 +112,17 @@ class RestaurantTest extends TestCase
     /** @test */
     public function customer_cannot_update_a_restaurant(): void
     {
-        $admin = User::factory()->create([
-            'user_type' => 'admin'
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
         ]);
         $customer = User::factory()->create([
             'user_type' => 'customer'
         ]);
         $this->actingAs($customer);
-        $restaurant = Restaurant::factory()->create(['user_id' => $admin->id]);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id, Restaurant::factory()->make([
-            'user_id' => $admin->id,
+            'user_id' => $owner->id,
             'name' => 'Updated Restaurant Name'
         ])->toArray(), ['Accept' => 'application/json']);
 
@@ -134,15 +135,15 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function admin_cannot_update_other_users_restaurant(): void
+    public function owner_cannot_update_other_users_restaurant(): void
     {
-        $admin = User::factory()->create([
-            'user_type' => 'admin'
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
         ]);
         $otherUser = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
-        $this->actingAs($admin);
+        $this->actingAs($owner);
         $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id, Restaurant::factory()->make([
@@ -159,10 +160,10 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_get_restaurant_details(): void
+    public function owner_can_get_restaurant_details(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $this->actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
@@ -181,7 +182,7 @@ class RestaurantTest extends TestCase
     public function unauthenticated_user_cannot_get_restaurant_details(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
@@ -194,14 +195,14 @@ class RestaurantTest extends TestCase
     /** @test */
     public function customer_cannot_get_restaurant_details(): void
     {
-        $admin = User::factory()->create([
-            'user_type' => 'admin'
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
         ]);
         $customer = User::factory()->create([
             'user_type' => 'customer'
         ]);
         $this->actingAs($customer);
-        $restaurant = Restaurant::factory()->create(['user_id' => $admin->id]);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
 
         $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
 
@@ -210,15 +211,15 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function admin_cannot_get_other_users_restaurant_details(): void
+    public function owner_cannot_get_other_users_restaurant_details(): void
     {
-        $admin = User::factory()->create([
-            'user_type' => 'admin'
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
         ]);
         $otherUser = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
-        $this->actingAs($admin);
+        $this->actingAs($owner);
         $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
 
         $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
@@ -228,10 +229,10 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_deactivate_a_restaurant(): void
+    public function owner_can_deactivate_a_restaurant(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $this->actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
@@ -246,10 +247,10 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function unauthenticated_admin_cannot_deactivate_a_restaurant(): void
+    public function unauthenticated_owner_cannot_deactivate_a_restaurant(): void
     {
         $user = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
@@ -266,14 +267,14 @@ class RestaurantTest extends TestCase
     /** @test */
     public function customer_cannot_deactivate_a_restaurant(): void
     {
-        $admin = User::factory()->create([
-            'user_type' => 'admin'
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
         ]);
         $customer = User::factory()->create([
             'user_type' => 'customer'
         ]);
         $this->actingAs($customer);
-        $restaurant = Restaurant::factory()->create(['user_id' => $admin->id]);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
 
@@ -286,15 +287,15 @@ class RestaurantTest extends TestCase
     }
 
     /** @test */
-    public function other_admin_cannot_deactivate_another_users_restaurant(): void
+    public function other_owner_cannot_deactivate_another_users_restaurant(): void
     {
-        $admin = User::factory()->create([
-            'user_type' => 'admin'
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
         ]);
         $otherUser = User::factory()->create([
-            'user_type' => 'admin'
+            'user_type' => 'owner'
         ]);
-        $this->actingAs($admin);
+        $this->actingAs($owner);
         $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
