@@ -23,7 +23,7 @@ class RestaurantPolicy
 
     public function show(User $user, Restaurant $restaurant) : bool
     {
-        return $this->userRepository->isAdmin($user) || $restaurant->user_id === $user->id;
+        return $this->userRepository->isAdmin($user) && $restaurant->user_id === $user->id;
     }
     
     /**

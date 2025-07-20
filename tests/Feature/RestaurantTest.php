@@ -208,4 +208,22 @@ class RestaurantTest extends TestCase
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
     }
+
+    /** @test */
+    public function admin_cannot_get_other_users_restaurant_details(): void
+    {
+        $admin = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $otherUser = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $this->actingAs($admin);
+        $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
+
+        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
+
+        $response->assertStatus(403);
+        $response->assertJson(['message' => 'Forbidden']);
+    }
 }
