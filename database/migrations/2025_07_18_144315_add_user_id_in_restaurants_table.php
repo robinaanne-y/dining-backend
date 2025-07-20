@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('restaurant_admins', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('restaurant_id')
-                ->constrained()
-                ->cascadeOnDelete();
+        Schema::table('restaurants', function (Blueprint $table) {
             $table->foreignId('user_id')
-                ->constrained()
-                ->cascadeOnDelete();
-            $table->timestamps();
+                ->constrained('users')
+                ->onDelete('cascade')
+                ->after('id');
         });
     }
 
@@ -28,6 +24,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('restaurant_admins');
+        Schema::table('restaurants', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
+        });
     }
 };

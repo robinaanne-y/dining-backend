@@ -6,18 +6,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class RegisterAdminTest extends TestCase
+class RegisterOwnerTest extends TestCase
 {
 
     use RefreshDatabase, WithFaker;
 
 
     /** @test */
-    public function register_admin_returns_a_successful_response(): void
+    public function register_owner_returns_a_successful_response(): void
     {
         $response = $this->post('/api/register', [
             'name' => $this->faker->name(),
-            'user_type' => 'admin',
+            'user_type' => 'owner',
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
@@ -27,10 +27,10 @@ class RegisterAdminTest extends TestCase
     }
 
      /** @test */
-    public function register_admin_returns_a_failed_response(): void
+    public function register_owner_returns_a_failed_response(): void
     {
         $response = $this->post('/api/register', [
-            'user_type' => 'admin',
+            'user_type' => 'owner',
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',

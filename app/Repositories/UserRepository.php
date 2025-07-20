@@ -10,4 +10,14 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::where('email', $email)->first();
     }
+
+    public function isOwner($user): bool
+    {
+        return $user->user_type === 'owner';
+    }
+
+    public function findById(int $id)
+    {
+        return User::find($id);
+    }
 }
