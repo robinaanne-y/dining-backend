@@ -226,4 +226,84 @@ class RestaurantTest extends TestCase
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
     }
+
+    /** @test */
+    public function admin_can_deactivate_a_restaurant(): void
+    {
+        $user = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $this->actingAs($user);
+        $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('restaurants', [
+            'id' => $restaurant->id,
+            'active' => false,
+        ]);
+    }
+
+    /** @test */
+    public function unauthenticated_admin_cannot_deactivate_a_restaurant(): void
+    {
+        $user = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', [], ['Accept' => 'application/json']);
+
+        $response->assertStatus(401);
+        $response->assertJson(['message' => 'Unauthorized access']);
+        $this->assertDatabaseHas('restaurants', [
+            'id' => $restaurant->id,
+            'active' => true, // restaurant should still be active
+        ]);
+    }
+
+    /** @test */
+    public function customer_cannot_deactivate_a_restaurant(): void
+    {
+        $admin = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $customer = User::factory()->create([
+            'user_type' => 'customer'
+        ]);
+        $this->actingAs($customer);
+        $restaurant = Restaurant::factory()->create(['user_id' => $admin->id]);
+
+        $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
+
+        $response->assertStatus(403);
+        $response->assertJson(['message' => 'Forbidden']);
+        $this->assertDatabaseHas('restaurants', [
+            'id' => $restaurant->id,
+            'active' => true,
+        ]);
+    }
+
+    /** @test */
+    public function other_admin_cannot_deactivate_another_users_restaurant(): void
+    {
+        $admin = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $otherUser = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $this->actingAs($admin);
+        $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
+
+        $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
+
+        $response->assertStatus(403);
+        $response->assertJson(['message' => 'Forbidden']);
+        $this->assertDatabaseHas('restaurants', [
+            'id' => $restaurant->id,
+            'active' => true,
+        ]);
+    }
 }

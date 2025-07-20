@@ -34,4 +34,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show']);
     Route::post('/restaurants', [RestaurantController::class, 'store']);
     Route::put('/restaurants/{restaurant}', [RestaurantController::class, 'update']);
+    Route::put('/restaurants/{restaurant}/deactivate', [RestaurantController::class, 'deactivate']);
 });
