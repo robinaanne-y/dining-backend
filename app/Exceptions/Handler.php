@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -26,5 +27,27 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+    /**
+     * Customize response for unauthenticated requests (e.g., auth:sanctum middleware).
+     */
+    protected function unauthenticated($request, \Illuminate\Auth\AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Unauthorized access',
+                'error' => 'Unauthenticated',
+            ], 401);
+        }
+        return redirect()->guest(route('login'));
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof AuthorizationException) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return parent::render($request, $exception);
     }
 }
