@@ -58,6 +58,15 @@ class RestaurantController extends Controller
         return response()->json($restaurant, 200);
     }
 
+    public function activate(Restaurant $restaurant)
+    {
+        Gate::authorize('update-restaurant', [$restaurant, $this->userRepository->findById(auth()->id())]);
+
+        $restaurant->update(['active' => true]);
+
+        return response()->json($restaurant, 200);
+    }
+    
     public function deactivate(Restaurant $restaurant)
     {
         Gate::authorize('update-restaurant', [$restaurant, $this->userRepository->findById(auth()->id())]);

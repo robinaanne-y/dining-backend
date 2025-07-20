@@ -19,8 +19,8 @@ class RestaurantTest extends TestCase
         $user = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        
-        $this->actingAs($user);
+
+        Sanctum::actingAs($user);
         $response = $this->post('/api/restaurants', Restaurant::factory()->make([
             'user_id' => $user->id
         ])->toArray());
@@ -55,7 +55,7 @@ class RestaurantTest extends TestCase
         $user = User::factory()->create([
             'user_type' => 'customer'
         ]);
-        $this->actingAs($user);
+        Sanctum::actingAs($user);
         $response = $this->post('/api/restaurants', Restaurant::factory()->make([
             'user_id' => $user->id
         ])->toArray(), ['Accept' => 'application/json']);
@@ -73,7 +73,7 @@ class RestaurantTest extends TestCase
         $user = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        $this->actingAs($user);
+        Sanctum::actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id, Restaurant::factory()->make([
@@ -118,7 +118,7 @@ class RestaurantTest extends TestCase
         $customer = User::factory()->create([
             'user_type' => 'customer'
         ]);
-        $this->actingAs($customer);
+        Sanctum::actingAs($customer);
         $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id, Restaurant::factory()->make([
@@ -143,7 +143,7 @@ class RestaurantTest extends TestCase
         $otherUser = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        $this->actingAs($owner);
+        Sanctum::actingAs($owner);
         $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id, Restaurant::factory()->make([
@@ -165,7 +165,7 @@ class RestaurantTest extends TestCase
         $user = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        $this->actingAs($user);
+        Sanctum::actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
         $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
@@ -201,7 +201,7 @@ class RestaurantTest extends TestCase
         $customer = User::factory()->create([
             'user_type' => 'customer'
         ]);
-        $this->actingAs($customer);
+        Sanctum::actingAs($customer);
         $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
 
         $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
@@ -219,7 +219,7 @@ class RestaurantTest extends TestCase
         $otherUser = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        $this->actingAs($owner);
+        Sanctum::actingAs($owner);
         $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
 
         $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
@@ -234,7 +234,7 @@ class RestaurantTest extends TestCase
         $user = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        $this->actingAs($user);
+        Sanctum::actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
@@ -273,7 +273,7 @@ class RestaurantTest extends TestCase
         $customer = User::factory()->create([
             'user_type' => 'customer'
         ]);
-        $this->actingAs($customer);
+        Sanctum::actingAs($customer);
         $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
@@ -295,13 +295,31 @@ class RestaurantTest extends TestCase
         $otherUser = User::factory()->create([
             'user_type' => 'owner'
         ]);
-        $this->actingAs($owner);
+        Sanctum::actingAs($owner);
         $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
 
         $response = $this->put('/api/restaurants/' . $restaurant->id .'/deactivate', ['Accept' => 'application/json']);
 
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
+        $this->assertDatabaseHas('restaurants', [
+            'id' => $restaurant->id,
+            'active' => true,
+        ]);
+    }
+
+    /** @test */
+    public function owner_can_activate_a_restaurant(): void
+    {
+        $user = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+        Sanctum::actingAs($user);
+        $restaurant = Restaurant::factory()->create(['user_id' => $user->id, 'active' => false]);
+
+        $response = $this->put('/api/restaurants/' . $restaurant->id .'/activate', ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
         $this->assertDatabaseHas('restaurants', [
             'id' => $restaurant->id,
             'active' => true,
