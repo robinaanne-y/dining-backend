@@ -6,6 +6,7 @@ use \App\Models\User;
 use App\Models\Restaurant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class RestaurantTest extends TestCase
@@ -157,5 +158,54 @@ class RestaurantTest extends TestCase
         ]);
     }
 
-    
+    /** @test */
+    public function admin_can_get_restaurant_details(): void
+    {
+        $user = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $this->actingAs($user);
+        $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'id' => $restaurant->id,
+            'name' => $restaurant->name,
+            'user_id' => $restaurant->user_id,
+        ]);
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_get_restaurant_details(): void
+    {
+        $user = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
+
+        $response->assertStatus(401);
+        $response->assertJson(['message' => 'Unauthorized access']);
+    }
+
+    /** @test */
+    public function customer_cannot_get_restaurant_details(): void
+    {
+        $admin = User::factory()->create([
+            'user_type' => 'admin'
+        ]);
+        $customer = User::factory()->create([
+            'user_type' => 'customer'
+        ]);
+        $this->actingAs($customer);
+        $restaurant = Restaurant::factory()->create(['user_id' => $admin->id]);
+
+        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
+
+        $response->assertStatus(403);
+        $response->assertJson(['message' => 'Forbidden']);
+    }
 }

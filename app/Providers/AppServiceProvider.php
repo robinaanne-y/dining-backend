@@ -39,5 +39,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('create-restaurant', [RestaurantPolicy::class, 'create']);
         Gate::define('update-restaurant', [RestaurantPolicy::class, 'update']);
+        Gate::define('view-restaurant', [RestaurantPolicy::class, 'show']);
     }
 }

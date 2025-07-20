@@ -18,6 +18,27 @@ class RestaurantController extends Controller
 
     }
 
+
+    /**
+     * Display the specified restaurant.
+     * This method retrieves a restaurant by its ID and checks if the user has permission to view it.
+     * If the user is authorized, it returns the restaurant data in JSON format.
+     * @param Restaurant $restaurant
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(Restaurant $restaurant)
+    {
+        Gate::authorize('view-restaurant', [$restaurant, $this->userRepository->findById(auth()->id())]);
+        return response()->json($restaurant, 200);
+    }
+
+    /**
+     * Store a new restaurant.
+        * This method handles the creation of a new restaurant, validating the input data,
+        * creating a new restaurant record in the database, and returning a success response.
+        * @param Request $request
+        * @return \Illuminate\Http\JsonResponse
+     */
     public function store(RestaurantRequest $request)
     {
 
