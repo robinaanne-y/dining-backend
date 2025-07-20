@@ -1,14 +1,14 @@
 
 # 🍽️ Dining App Backend
 
-This is a Laravel-powered backend API for a dining app. Customers can scan QR codes, browse menus, and place orders. Restaurant admins can manage menus, tables, and track orders through a dashboard.
+This is a Laravel-powered backend API for a dining app. Customers can scan QR codes, browse menus, and place orders. Restaurant owners can manage menus, tables, and track orders through a dashboard.
 
 ---
 
 ## 📌 Features
 
 - API endpoints for menu browsing, order creation, and status updates
-- Admin features for managing:
+- Owner features for managing:
   - Menu items (CRUD)
   - Restaurant tables and QR codes
   - Customer orders and fulfillment
@@ -90,16 +90,20 @@ For API testing (e.g., in Postman), use login endpoints to retrieve tokens and a
 
 
 ## 🔌 API Endpoints
-| Endpoint                        | Method | Description                  |
-| ------------------------------- | ------ | ---------------------------- |
-| `/api/login`                    | POST   | User login                   |
-| `/api/logout`                   | POST   | User logout                  |
-| `/api/menu-items`               | GET    | Get available menu items     |
-| `/api/orders`                   | POST   | Place a new order            |
-| `/api/orders/{id}`              | GET    | View order details           |
-| `/api/admin/orders/{id}/status` | PUT    | Update order status (admin)  |
-| `/api/admin/tables`             | GET    | List restaurant tables       |
-| `/api/admin/menu-items`         | POST   | Create new menu item (admin) |
+| Endpoint                           | Method | Actor          | Description                  |
+| ---------------------------------- | ------ | -------------- |----------------------------- |
+| `/api/login`                       | POST   | Owner/Customer | User login                   |
+| `/api/logout`                      | POST   | Owner/Customer | User logout                  |
+| `/api/restaurants/{id}`            | GET    | Owner          | Get restaurant details       |
+| `/api/restaurants`                 | POST   | Owner          | Register restaurant          |
+| `/api/restaurants/{id}`            | PUT    | Owner          | Update restaurant details    |
+| `/api/restaurants/{id}/deactivate` | PUT    | Owner          | Deactivate restaurant        |
+| `/api/restaurants/{id}/activate`   | PUT    | Owner          | Activate restaurant          |
+| `/api/menu-items`                  | GET    | Owner/Customer | Get available menu items     |
+| `/api/orders`                      | POST   | Owner          | Place a new order            |
+| `/api/orders/{id}`                 | GET    | Owner          | View order details           |
+| `/api/orders/{id}/status`          | PUT    | Owner          | Update order status (owner)  |
+| `/api/tables`                      | GET    | Owner          | List restaurant tables       |
 
 ---
 
