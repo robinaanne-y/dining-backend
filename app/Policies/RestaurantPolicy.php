@@ -2,9 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Restaurant;
 use App\Models\User;
 use App\Repositories\RestaurantRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Auth\Access\Response;
 
 class RestaurantPolicy
 {
@@ -24,8 +26,8 @@ class RestaurantPolicy
         return $this->userRepository->isAdmin($user);
     }
 
-    public function update(User $user) : bool
+    public function update(User $user, Restaurant $restaurant) : bool
     {
-        return $this->userRepository->isAdmin($user);
+        return ($this->userRepository->isAdmin($user) && $restaurant->user_id === $user->id);
     }
 }
