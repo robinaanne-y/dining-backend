@@ -6,7 +6,6 @@ use App\Models\Restaurant;
 use App\Models\User;
 use App\Repositories\RestaurantRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
-use Illuminate\Auth\Access\Response;
 
 class RestaurantPolicy
 {
