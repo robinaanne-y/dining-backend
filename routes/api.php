@@ -3,6 +3,7 @@
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\MenuItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,4 +37,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/restaurants/{restaurant}', [RestaurantController::class, 'update']);
     Route::put('/restaurants/{restaurant}/deactivate', [RestaurantController::class, 'deactivate']);
     Route::put('/restaurants/{restaurant}/activate', [RestaurantController::class, 'activate']);
+
+    Route::post('/menu-items', [MenuItemController::class, 'store']);
 });
