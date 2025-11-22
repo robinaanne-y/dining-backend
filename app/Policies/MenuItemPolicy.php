@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\Restaurant;
 use App\Repositories\MenuItemRepository;
 use App\Repositories\UserRepositoryInterface;
 
@@ -22,8 +23,8 @@ class MenuItemPolicy
      * @param User $user
      * @return bool
      */
-    public function createMenuItem(User $user) : bool
+    public function createMenuItem(User $user, Restaurant $restaurant) : bool
     {
-        return $this->userRepository->isOwner($user);
+        return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
     }
 }
