@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Policies\MenuItemPolicy;
 use App\Policies\RestaurantPolicy;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\RestaurantRepositoryInterface;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
+use App\Repositories\MenuItemRepository;
+use App\Repositories\MenuItemRepositoryInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
             // Bind interfaces to implementations
             UserRepositoryInterface::class => UserRepository::class,
             RestaurantRepositoryInterface::class => RestaurantRepository::class,
+            MenuItemRepositoryInterface::class => MenuItemRepository::class,
         ];
 
         foreach ($bindings as $interface => $implementation) {
@@ -40,5 +44,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('create-restaurant', [RestaurantPolicy::class, 'create']);
         Gate::define('update-restaurant', [RestaurantPolicy::class, 'update']);
         Gate::define('view-restaurant', [RestaurantPolicy::class, 'show']);
+        Gate::define('create-menu-item', [MenuItemPolicy::class, 'createMenuItem']);
     }
 }
