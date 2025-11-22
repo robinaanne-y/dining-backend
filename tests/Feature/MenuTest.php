@@ -145,7 +145,7 @@ class MenuTest extends TestCase
         ]);
 
         Sanctum::actingAs($owner, ['*']);
-        $response = $this->putJson("/api/menu-items/{$menuItem->id}", [
+        $response = $this->put("/api/menu-items/{$menuItem->id}", [
             'name' => 'Updated Menu Item',
             'description' => 'Updated description',
             'price' => 7.99,
@@ -160,6 +160,127 @@ class MenuTest extends TestCase
             'name' => 'Updated Menu Item',
             'price' => 7.99,
             'availability' => false,
+        ]);
+    }
+    
+    /** @test */
+    public function non_owner_cannot_update_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $nonOwner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Old Menu Item',
+            'description' => 'Old description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'availability' => true,
+        ]);
+
+        Sanctum::actingAs($nonOwner, ['*']);
+        $response = $this->put("/api/menu-items/{$menuItem->id}", [
+            'name' => 'Updated Menu Item',
+            'description' => 'Updated description',
+            'price' => 7.99,
+            'category' => 'Main Course',
+            'availability' => false,
+            'user_id' => $nonOwner->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+            'name' => 'Old Menu Item',
+            'price' => 5.99,
+            'availability' => true,
+        ]);
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_update_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Old Menu Item',
+            'description' => 'Old description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'availability' => true,
+        ]);
+
+        $response = $this->putJson("/api/menu-items/{$menuItem->id}", [
+            'name' => 'Updated Menu Item',
+            'description' => 'Updated description',
+            'price' => 7.99,
+            'category' => 'Main Course',
+            'availability' => false,
+            'user_id' => null,
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+            'name' => 'Old Menu Item',
+            'price' => 5.99,
+            'availability' => true,
+        ]);
+    }
+
+    /** @test */
+    public function owner_cannot_update_menu_item_of_another_restaurant(): void
+    {
+        $owner1 = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $owner2 = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner2->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Old Menu Item',
+            'description' => 'Old description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'availability' => true,
+        ]);
+
+        Sanctum::actingAs($owner1, ['*']);
+        $response = $this->put("/api/menu-items/{$menuItem->id}", [
+            'name' => 'Updated Menu Item',
+            'description' => 'Updated description',
+            'price' => 7.99,
+            'category' => 'Main Course',
+            'availability' => false,
+            'user_id' => $owner1->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+            'name' => 'Old Menu Item',
+            'price' => 5.99,
+            'availability' => true,
         ]);
     }
     
