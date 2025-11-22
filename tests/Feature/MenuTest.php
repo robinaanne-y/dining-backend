@@ -124,4 +124,43 @@ class MenuTest extends TestCase
             'restaurant_id' => $restaurant->id
         ]);
     }
+
+    /** @test */
+    public function owner_can_update_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Old Menu Item',
+            'description' => 'Old description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'availability' => true,
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+        $response = $this->putJson("/api/menu-items/{$menuItem->id}", [
+            'name' => 'Updated Menu Item',
+            'description' => 'Updated description',
+            'price' => 7.99,
+            'category' => 'Main Course',
+            'availability' => false,
+            'user_id' => $owner->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+            'name' => 'Updated Menu Item',
+            'price' => 7.99,
+            'availability' => false,
+        ]);
+    }
+    
 }

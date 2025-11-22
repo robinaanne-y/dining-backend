@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 Use App\Http\Requests\MenuItemRequest;
+use App\Models\MenuItem;
 Use App\Repositories\MenuItemRepositoryInterface;
 use App\Repositories\RestaurantRepositoryInterface;
 Use App\Repositories\UserRepositoryInterface;
@@ -42,5 +43,23 @@ class MenuItemController extends Controller
         $menuItem = $this->menuItemRepository->create($data);
 
         return response()->json($menuItem, 201);
+    }
+
+    /**
+     * Update the specified menu item in storage.
+     * 
+     */
+    public function update(MenuItemRequest $request, MenuItem $menuItem)
+    {
+        Gate::authorize('update-menu-item', [
+            $this->restaurantRepository->findById($menuItem->restaurant_id),
+            $this->userRepository->findById(auth()->id())
+        ]);
+
+        $data = Arr::except($request->validated(), ['user_id']);
+
+        $menuItem->update($data);
+
+        return response()->json($menuItem, 200);
     }
 }
