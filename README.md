@@ -90,20 +90,23 @@ For API testing (e.g., in Postman), use login endpoints to retrieve tokens and a
 
 
 ## 🔌 API Endpoints
-| Endpoint                           | Method | Actor          | Description                  |
-| ---------------------------------- | ------ | -------------- |----------------------------- |
-| `/api/login`                       | POST   | Owner/Customer | User login                   |
-| `/api/logout`                      | POST   | Owner/Customer | User logout                  |
-| `/api/restaurants/{id}`            | GET    | Owner          | Get restaurant details       |
-| `/api/restaurants`                 | POST   | Owner          | Register restaurant          |
-| `/api/restaurants/{id}`            | PUT    | Owner          | Update restaurant details    |
-| `/api/restaurants/{id}/deactivate` | PUT    | Owner          | Deactivate restaurant        |
-| `/api/restaurants/{id}/activate`   | PUT    | Owner          | Activate restaurant          |
-| `/api/menu-items`                  | GET    | Owner/Customer | Get available menu items     |
-| `/api/orders`                      | POST   | Owner          | Place a new order            |
-| `/api/orders/{id}`                 | GET    | Owner          | View order details           |
-| `/api/orders/{id}/status`          | PUT    | Owner          | Update order status (owner)  |
-| `/api/tables`                      | GET    | Owner          | List restaurant tables       |
+| Endpoint                                    | Method | Actor          | Description                  |
+| ------------------------------------------- | ------ | -------------- |----------------------------- |
+| `/api/login`                                | POST   | Owner/Customer | User login                   |
+| `/api/logout`                               | POST   | Owner/Customer | User logout                  |
+| `/api/restaurants/{id}`                     | GET    | Owner          | Get restaurant details       |
+| `/api/restaurants`                          | POST   | Owner          | Register restaurant          |
+| `/api/restaurants/{id}`                     | PUT    | Owner          | Update restaurant details    |
+| `/api/restaurants/{id}/deactivate`          | PUT    | Owner          | Deactivate restaurant        |
+| `/api/restaurants/{id}/activate`            | PUT    | Owner          | Activate restaurant          |
+| `/api/restaurants/{id}/menu-items`          | POST   | Owner          | Get all menu items           |
+| `/api/menu-items`                           | POST   | Owner          | Create a menu item           |
+| `/api/menu-items/{id}`                      | PUT    | Owner          | Update a menu item           |
+| `/api/orders`                               | POST   | Owner          | Place a new order            |
+| `/api/orders/{id}`                          | GET    | Owner          | View order details           |
+| `/api/orders/{id}/status`                   | PUT    | Owner          | Update order status (owner)  |
+| `/api/tables`                               | GET    | Owner          | List restaurant tables       |
+| `/api/customer/restaurants/{id}/menu-items` | GET    | Customer       | Get active menu items        |
 
 ---
 
