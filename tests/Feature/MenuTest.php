@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Restaurant;
+use App\Models\MenuItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -283,5 +284,30 @@ class MenuTest extends TestCase
             'status' => 'available',
         ]);
     }
-    
+
+    /** @test */
+    public function show_all_menu_items_of_a_restaurant(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+        
+        Sanctum::actingAs($owner, ['*']);
+
+        MenuItem::factory()->count(5)->create([
+            'restaurant_id' => $restaurant->id
+        ]);
+
+        $response = $this->post('/api/restaurant/' . $restaurant->id . '/menu-items',[
+            'user_id' => $owner->id,
+            'restaurant_id' => $restaurant->id
+        ]);
+        $response->assertStatus(200);
+        $responseData = $response->json();
+        $this->assertArrayHasKey('menu_items', $responseData);
+        $this->assertCount(5, $responseData['menu_items']);
+    }
 }
