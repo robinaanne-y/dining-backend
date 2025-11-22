@@ -47,4 +47,5 @@ class MenuItemPolicy
     {
         return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
     }
+    
 }

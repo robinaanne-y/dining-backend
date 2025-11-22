@@ -6,6 +6,7 @@ use App\Models\MenuItem;
 
 interface MenuItemRepositoryInterface
 {
-    public function getAllFromRestaurant($restaurantId);
     public function create(array $data): MenuItem;
+    public function getAllFromRestaurant($restaurantId);
+    public function getActiveFromRestaurant($restaurantId);
 }

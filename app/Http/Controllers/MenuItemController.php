@@ -81,10 +81,22 @@ class MenuItemController extends Controller
         ]);
 
         $data = Arr::except($request->validated(), ['user_id']);
-
+        
         $menuItem->update($data);
 
         return response()->json($menuItem, 200);
     }
     
+
+    /**
+     * Display a listing of the menu items for customers.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function customerIndex(Restaurant $restaurant)
+    {
+        $menuItems = $this->menuItemRepository->getActiveFromRestaurant($restaurant->id);
+        return response()->json([
+            'menu_items' => $menuItems
+        ], 200);
+    }
 }

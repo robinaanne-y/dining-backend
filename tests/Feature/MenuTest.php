@@ -301,7 +301,7 @@ class MenuTest extends TestCase
             'restaurant_id' => $restaurant->id
         ]);
 
-        $response = $this->post('/api/restaurant/' . $restaurant->id . '/menu-items',[
+        $response = $this->post('/api/restaurants/' . $restaurant->id . '/menu-items',[
             'user_id' => $owner->id,
             'restaurant_id' => $restaurant->id
         ]);
@@ -309,5 +309,91 @@ class MenuTest extends TestCase
         $responseData = $response->json();
         $this->assertArrayHasKey('menu_items', $responseData);
         $this->assertCount(5, $responseData['menu_items']);
+    }
+
+    /** @test */
+    public function non_owner_cannot_view_menu_items_of_a_restaurant(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+        $nonOwner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+        
+        Sanctum::actingAs($nonOwner, ['*']);
+
+        MenuItem::factory()->count(5)->create([
+            'restaurant_id' => $restaurant->id
+        ]);
+
+        $response = $this->post('/api/restaurants/' . $restaurant->id . '/menu-items',[
+            'user_id' => $nonOwner->id,
+            'restaurant_id' => $restaurant->id
+        ]);
+        $response->assertStatus(403);
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_view_menu_items_of_a_restaurant(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        MenuItem::factory()->count(5)->create([
+            'restaurant_id' => $restaurant->id
+        ]);
+        $response = $this->postJson('/api/restaurants/' . $restaurant->id . '/menu-items',[
+            'user_id' => null,
+            'restaurant_id' => $restaurant->id
+        ]);
+        $response->assertStatus(401);
+    }
+
+    /** @test */
+    public function customer_can_view_available_menu_items_of_a_restaurant(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+        $customer = User::factory()->create([
+            'user_type' => 'customer'
+        ]);
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+        
+        Sanctum::actingAs($customer, ['*']);
+
+        MenuItem::factory()->count(3)->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available'
+        ]);
+
+        MenuItem::factory()->count(3)->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'unavailable'
+        ]);
+
+        MenuItem::factory()->count(2)->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'inactive'
+        ]);
+
+        $response = $this->get('/api/customer/restaurants/' . $restaurant->id . '/menu-items',[
+            'user_id' => $customer->id,
+            'restaurant_id' => $restaurant->id
+        ]);
+        $response->assertStatus(200);
+        $responseData = $response->json();
+        $this->assertArrayHasKey('menu_items', $responseData);
+        $this->assertCount(6, $responseData['menu_items']);
     }
 }
