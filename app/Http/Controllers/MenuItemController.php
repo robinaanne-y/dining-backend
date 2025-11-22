@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 Use App\Http\Requests\MenuItemRequest;
+use App\Models\MenuItem;
+use App\Models\Restaurant;
 Use App\Repositories\MenuItemRepositoryInterface;
 use App\Repositories\RestaurantRepositoryInterface;
 Use App\Repositories\UserRepositoryInterface;
 Use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 
 class MenuItemController extends Controller
 {
@@ -19,6 +22,23 @@ class MenuItemController extends Controller
     {
 
     }
+
+    /**
+     * Display a listing of the menu items.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Request $request, Restaurant $restaurant)
+    {
+        Gate::authorize('show-menu-items', [
+            $this->restaurantRepository->findById($restaurant->id),
+            $this->userRepository->findById($request->user_id)
+        ]);
+        $menuItems = $this->menuItemRepository->getAllFromRestaurant($restaurant->id);
+        return response()->json([
+            'menu_items' => $menuItems
+        ], 200);
+    }
+
 
     /**
      * Store a newly created menu item in storage.
@@ -42,5 +62,41 @@ class MenuItemController extends Controller
         $menuItem = $this->menuItemRepository->create($data);
 
         return response()->json($menuItem, 201);
+    }
+
+    /**
+     * Update the specified menu item in storage.
+     * This method handles the updating of an existing menu item, validating the input data,
+     * checking user permissions, updating the menu item record in the database,
+     * and returning a success response.
+     * @param MenuItemRequest $request
+     * @param MenuItem $menuItem
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(MenuItemRequest $request, MenuItem $menuItem)
+    {
+        Gate::authorize('update-menu-item', [
+            $this->restaurantRepository->findById($menuItem->restaurant_id),
+            $this->userRepository->findById(auth()->id())
+        ]);
+
+        $data = Arr::except($request->validated(), ['user_id']);
+        
+        $menuItem->update($data);
+
+        return response()->json($menuItem, 200);
+    }
+    
+
+    /**
+     * Display a listing of the menu items for customers.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function customerIndex(Restaurant $restaurant)
+    {
+        $menuItems = $this->menuItemRepository->getActiveFromRestaurant($restaurant->id);
+        return response()->json([
+            'menu_items' => $menuItems
+        ], 200);
     }
 }

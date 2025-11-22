@@ -21,15 +21,22 @@ class MenuItemRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|decimal:0,2',
-            'category' => 'required|string|max:100',
-            'availability' => 'required|boolean',
-            'restaurant_id' => 'required|exists:restaurants,id',
+        $rules = [
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'category' => 'required|string',
+            'status' => 'required|string',
             'user_id' => 'required|exists:users,id',
-            'image_url' => 'nullable|url'
+            'restaurant_id' => 'required|exists:restaurants,id',
         ];
+
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            // allow partial updates on update
+            foreach ($rules as $key => $rule) {
+                $rules[$key] = 'sometimes|' . $rule;
+            }
+        }
+        return $rules;
     }
 }

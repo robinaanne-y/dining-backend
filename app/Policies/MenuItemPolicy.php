@@ -19,12 +19,33 @@ class MenuItemPolicy
     }
 
     /**
+     * Determine if the user can view menu items.
+     * @param User $user
+     * @return bool
+     */
+    public function index(User $user, Restaurant $restaurant) : bool
+    {
+        return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
+    }
+
+    /**
      * Determine if the user can create a menu item.
      * @param User $user
      * @return bool
      */
-    public function createMenuItem(User $user, Restaurant $restaurant) : bool
+    public function create(User $user, Restaurant $restaurant) : bool
     {
         return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
     }
+
+    /**
+     * Determine if the user can update a menu item.
+     * @param User $user
+     * @return bool
+     */
+    public function update(User $user, Restaurant $restaurant) : bool
+    {
+        return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
+    }
+    
 }
