@@ -31,7 +31,7 @@ class MenuTest extends TestCase
             'description' => 'Delicious new item',
             'price' => 9.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
             'user_id' => $user->id,
             'restaurant_id' => $restaurant->id
         ]);
@@ -58,7 +58,7 @@ class MenuTest extends TestCase
             'description' => 'Delicious new item',
             'price' => 9.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
             'user_id' => $user->id,
             'restaurant_id' => $restaurant->id
         ]);
@@ -91,7 +91,7 @@ class MenuTest extends TestCase
             'description' => 'Delicious new item',
             'price' => 9.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
             'user_id' => $owner1->id,
             'restaurant_id' => $restaurant->id
         ]);
@@ -113,7 +113,7 @@ class MenuTest extends TestCase
             'description' => 'Delicious new item',
             'price' => 9.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
             'user_id' => null,
             'restaurant_id' => $restaurant->id
         ]);
@@ -141,7 +141,7 @@ class MenuTest extends TestCase
             'description' => 'Old description',
             'price' => 5.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
         ]);
 
         Sanctum::actingAs($owner, ['*']);
@@ -150,7 +150,7 @@ class MenuTest extends TestCase
             'description' => 'Updated description',
             'price' => 7.99,
             'category' => 'Main Course',
-            'availability' => false,
+            'status' => 'unavailable',
             'user_id' => $owner->id,
         ]);
 
@@ -159,7 +159,7 @@ class MenuTest extends TestCase
             'id' => $menuItem->id,
             'name' => 'Updated Menu Item',
             'price' => 7.99,
-            'availability' => false,
+            'status' => 'unavailable',
         ]);
     }
     
@@ -183,7 +183,7 @@ class MenuTest extends TestCase
             'description' => 'Old description',
             'price' => 5.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
         ]);
 
         Sanctum::actingAs($nonOwner, ['*']);
@@ -192,7 +192,7 @@ class MenuTest extends TestCase
             'description' => 'Updated description',
             'price' => 7.99,
             'category' => 'Main Course',
-            'availability' => false,
+            'status' => 'unavailable',
             'user_id' => $nonOwner->id,
         ]);
 
@@ -201,7 +201,7 @@ class MenuTest extends TestCase
             'id' => $menuItem->id,
             'name' => 'Old Menu Item',
             'price' => 5.99,
-            'availability' => true,
+            'status' => 'available',
         ]);
     }
 
@@ -221,7 +221,7 @@ class MenuTest extends TestCase
             'description' => 'Old description',
             'price' => 5.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
         ]);
 
         $response = $this->putJson("/api/menu-items/{$menuItem->id}", [
@@ -229,7 +229,7 @@ class MenuTest extends TestCase
             'description' => 'Updated description',
             'price' => 7.99,
             'category' => 'Main Course',
-            'availability' => false,
+            'status' => 'unavailable',
             'user_id' => null,
         ]);
 
@@ -238,7 +238,7 @@ class MenuTest extends TestCase
             'id' => $menuItem->id,
             'name' => 'Old Menu Item',
             'price' => 5.99,
-            'availability' => true,
+            'status' => 'available',
         ]);
     }
 
@@ -262,7 +262,7 @@ class MenuTest extends TestCase
             'description' => 'Old description',
             'price' => 5.99,
             'category' => 'Appetizers',
-            'availability' => true,
+            'status' => 'available',
         ]);
 
         Sanctum::actingAs($owner1, ['*']);
@@ -271,7 +271,7 @@ class MenuTest extends TestCase
             'description' => 'Updated description',
             'price' => 7.99,
             'category' => 'Main Course',
-            'availability' => false,
+            'status' => 'available',
             'user_id' => $owner1->id,
         ]);
 
@@ -280,7 +280,7 @@ class MenuTest extends TestCase
             'id' => $menuItem->id,
             'name' => 'Old Menu Item',
             'price' => 5.99,
-            'availability' => true,
+            'status' => 'available',
         ]);
     }
     

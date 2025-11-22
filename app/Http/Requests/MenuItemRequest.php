@@ -26,7 +26,7 @@ class MenuItemRequest extends FormRequest
             'description' => 'required|string',
             'price' => 'required|numeric',
             'category' => 'required|string',
-            'availability' => 'required|boolean',
+            'status' => 'required|string',
             'user_id' => 'required|exists:users,id',
             'restaurant_id' => 'required|exists:restaurants,id',
         ];
