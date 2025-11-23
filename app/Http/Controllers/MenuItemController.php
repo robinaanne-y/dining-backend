@@ -117,6 +117,10 @@ class MenuItemController extends Controller
             $this->userRepository->findById(auth()->id())
         ]);
 
+        if($menuItem->orderItems()->exists()){
+            return response()->json(['error' => 'Cannot delete menu item associated with existing orders.'], 400);
+        }
+
         $menuItem->delete();
 
         return response()->json(null, 204);

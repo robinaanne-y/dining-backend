@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Restaurant;
 use App\Models\MenuItem;
+use App\Models\OrderItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -543,6 +544,40 @@ class MenuTest extends TestCase
         $response = $this->delete("/api/menu-items/{$menuItem->id}");
 
         $response->assertStatus(403);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    /** @test */
+    public function menu_item_cannot_be_deleted_if_it_has_orders(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 6.00,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        OrderItem::factory()->create([
+            'menu_item_id' => $menuItem->id,
+            'quantity' => 2,
+            'price' => 12.00,
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(400); // Assuming the controller returns 400 Bad Request
         $this->assertDatabaseHas('menu_items', [
             'id' => $menuItem->id,
         ]);
