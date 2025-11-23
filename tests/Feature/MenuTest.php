@@ -396,4 +396,34 @@ class MenuTest extends TestCase
         $this->assertArrayHasKey('menu_items', $responseData);
         $this->assertCount(6, $responseData['menu_items']);
     }
+
+    /** @test */
+    public function owner_can_delete_a_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    
 }
