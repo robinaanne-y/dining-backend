@@ -102,6 +102,7 @@ For API testing (e.g., in Postman), use login endpoints to retrieve tokens and a
 | `/api/restaurants/{id}/menu-items`          | POST   | Owner          | Get all menu items           |
 | `/api/menu-items`                           | POST   | Owner          | Create a menu item           |
 | `/api/menu-items/{id}`                      | PUT    | Owner          | Update a menu item           |
+| `/api/menu-items/{id}`                      | DELETE | Owner          | Delete a menu item           |
 | `/api/orders`                               | POST   | Owner          | Place a new order            |
 | `/api/orders/{id}`                          | GET    | Owner          | View order details           |
 | `/api/orders/{id}/status`                   | PUT    | Owner          | Update order status (owner)  |

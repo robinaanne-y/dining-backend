@@ -99,4 +99,30 @@ class MenuItemController extends Controller
             'menu_items' => $menuItems
         ], 200);
     }
+
+    /**
+     * Remove the specified menu item from storage.
+     *
+     * This method handles the deletion of an existing menu item,
+     * checking user permissions, deleting the menu item record from the database,
+     * and returning a success response.
+     *
+     * @param MenuItem $menuItem
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(MenuItem $menuItem)
+    {
+        Gate::authorize('delete-menu-item', [
+            $this->restaurantRepository->findById($menuItem->restaurant_id),
+            $this->userRepository->findById(auth()->id())
+        ]);
+
+        if($menuItem->orderItems()->exists()){
+            return response()->json(['error' => 'Cannot delete menu item associated with existing orders.'], 400);
+        }
+
+        $menuItem->delete();
+
+        return response()->json(null, 204);
+    }
 }

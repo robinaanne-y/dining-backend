@@ -48,4 +48,8 @@ class MenuItemPolicy
         return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
     }
     
+    public function delete(User $user, Restaurant $restaurant) : bool
+    {
+        return ($this->userRepository->isOwner($user) && $restaurant->user_id === $user->id);
+    }
 }

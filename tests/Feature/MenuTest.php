@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Restaurant;
 use App\Models\MenuItem;
+use App\Models\OrderItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -395,5 +396,190 @@ class MenuTest extends TestCase
         $responseData = $response->json();
         $this->assertArrayHasKey('menu_items', $responseData);
         $this->assertCount(6, $responseData['menu_items']);
+    }
+
+    /** @test */
+    public function owner_can_delete_a_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    /** @test */
+    public function non_owner_cannot_delete_a_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $nonOwner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($nonOwner, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_delete_a_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        $response = $this->deleteJson("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(401);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    /** @test */
+    public function owner_cannot_delete_menu_item_of_another_restaurant(): void
+    {
+        $owner1 = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $owner2 = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner2->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($owner1, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    /** @test */
+    public function customer_cannot_delete_a_menu_item(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $customer = User::factory()->create([
+            'user_type' => 'customer'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 5.99,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($customer, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+        ]);
+    }
+
+    /** @test */
+    public function menu_item_cannot_be_deleted_if_it_has_orders(): void
+    {
+        $owner = User::factory()->create([
+            'user_type' => 'owner'
+        ]);
+
+        $restaurant = Restaurant::factory()->create([
+            'user_id' => $owner->id
+        ]);
+
+        $menuItem = $restaurant->menuItems()->create([
+            'name' => 'Menu Item to Delete',
+            'description' => 'Description',
+            'price' => 6.00,
+            'category' => 'Appetizers',
+            'status' => 'available',
+        ]);
+
+        OrderItem::factory()->create([
+            'menu_item_id' => $menuItem->id,
+            'quantity' => 2,
+            'price' => 12.00,
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+        $response = $this->delete("/api/menu-items/{$menuItem->id}");
+
+        $response->assertStatus(400); // Assuming the controller returns 400 Bad Request
+        $this->assertDatabaseHas('menu_items', [
+            'id' => $menuItem->id,
+        ]);
     }
 }
