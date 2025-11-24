@@ -4,6 +4,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\MenuItemController;
+use App\Http\Controllers\DiningTableController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/menu-items/{menuItem}', [MenuItemController::class, 'update']);
     Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy']);
     
+    Route::post('/restaurants/{restaurant}/dining-tables', [DiningTableController::class, 'store']);
 });
 
 Route::prefix('/customer')->group(function () {
