@@ -33,7 +33,7 @@ class DiningTableTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        $this->assertDatabase('dining_tables', [
+        $this->assertDatabaseHas('dining_tables', [
             'table_number' => '1',
             'seating_capacity' => 4,
             'restaurant_id' => $restaurant->id,
