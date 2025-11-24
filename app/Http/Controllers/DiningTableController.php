@@ -17,6 +17,11 @@ class DiningTableController extends Controller
 
     }
 
+    /** 
+     * Store a newly created dining table in storage.
+     * @param DiningTableRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(DiningTableRequest $request)
     {
         Gate::authorize('create-dining-table', [
@@ -30,4 +35,6 @@ class DiningTableController extends Controller
 
         return response()->json($diningTable, 201);
     }
+
+    
 }
