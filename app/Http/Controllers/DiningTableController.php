@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DiningTableRequest;
 use App\Models\Restaurant;
 use App\Repositories\DiningTableRepositoryInterface;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Arr;
 
 class DiningTableController extends Controller
 {
@@ -15,10 +17,14 @@ class DiningTableController extends Controller
 
     }
 
-    public function store(DiningTableRequest $request, Restaurant $restaurant)
+    public function store(DiningTableRequest $request)
     {
-        $data = $request->validated();
-        $data['restaurant_id'] = $restaurant->id;
+        Gate::authorize('create-dining-table', [
+            $request->restaurant_id,
+            $request->user_id
+        ]);
+
+        $data = Arr::except($request->validated(), ['user_id']);
 
         $diningTable = $this->diningTableRepository->create($data);
 

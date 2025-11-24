@@ -17,8 +17,8 @@ class DiningTablePolicy
         //
     }
 
-    public function create(User $user, int $restaurantUserId) : bool
+    public function create(User $user, int $restaurantId) : bool
     {
-        return ($this->diningTableRepository->isOwner($user) && $restaurantUserId === $user->id);
+        return ($this->diningTableRepository->isOwner($user, $restaurantId));
     }
 }

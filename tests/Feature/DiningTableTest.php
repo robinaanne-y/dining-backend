@@ -23,16 +23,17 @@ class DiningTableTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->post("/api/restaurants/{$restaurant->id}/dining-tables", [
+        $response = $this->post("/api/dining-tables", [
             'table_number' => '1',
             'seating_capacity' => 4,
             'restaurant_id' => $restaurant->id,
             'status' => 'available',
             'qr_token' => Str::uuid()->toString(),
+            'user_id' => $user->id,
         ]);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('dining_tables', [
+        $this->assertDatabase('dining_tables', [
             'table_number' => '1',
             'seating_capacity' => 4,
             'restaurant_id' => $restaurant->id,
