@@ -26,6 +26,7 @@ class DiningTableRequest extends FormRequest
             'seating_capacity' => 'required|integer|min:1',
             'status' => 'required|in:available,occupied,reserved',
             'qr_token' => 'required|string|unique:dining_tables,qr_token',
+            'restaurant_id' => 'required|exists:restaurants,id',
         ];
     }
 }

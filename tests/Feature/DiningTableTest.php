@@ -23,12 +23,13 @@ class DiningTableTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->post("/api/restaurants/{$restaurant->id}/dining-tables", [
+        $response = $this->post("/api/dining-tables", [
             'table_number' => '1',
             'seating_capacity' => 4,
             'restaurant_id' => $restaurant->id,
             'status' => 'available',
             'qr_token' => Str::uuid()->toString(),
+            'user_id' => $user->id,
         ]);
 
         $response->assertStatus(201);
@@ -38,5 +39,82 @@ class DiningTableTest extends TestCase
             'restaurant_id' => $restaurant->id,
             'status' => 'available',
         ]);
+    }
+
+    /** @test */
+    public function non_owner_cannot_add_a_dining_table(): void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $nonOwner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+
+        Sanctum::actingAs($nonOwner, ['*']);
+
+        $response = $this->post("/api/dining-tables", [
+            'table_number' => '1',
+            'seating_capacity' => 4,
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+            'qr_token' => Str::uuid()->toString(),
+            'user_id' => $nonOwner->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('dining_tables', [
+            'table_number' => '1',
+            'seating_capacity' => 4,
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]); 
+    }
+
+    /** @test */
+    public function unauthorized_user_cannot_add_a_dining_table(): void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+
+        $response = $this->postJson("/api/dining-tables", [
+            'table_number' => '1',
+            'seating_capacity' => 4,
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+            'qr_token' => Str::uuid()->toString(),
+            'user_id' => $owner->id,
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertDatabaseMissing('dining_tables', [
+            'table_number' => '1',
+            'seating_capacity' => 4,
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]); 
+    }
+
+    /** @test */
+    public function customer_cannot_add_a_dining_table(): void
+    {
+        $customer = User::factory()->create(['user_type' => 'customer']);
+        $restaurant = Restaurant::factory()->create();
+
+        Sanctum::actingAs($customer, ['*']);
+
+        $response = $this->post("/api/dining-tables", [
+            'table_number' => '1',
+            'seating_capacity' => 4,
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+            'qr_token' => Str::uuid()->toString(),
+            'user_id' => $customer->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('dining_tables', [
+            'table_number' => '1',
+            'seating_capacity' => 4,
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]); 
     }
 }
