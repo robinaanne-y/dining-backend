@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DiningTable;
 use App\Http\Requests\DiningTableRequest;
-use App\Models\Restaurant;
 use App\Repositories\DiningTableRepositoryInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Arr;
@@ -28,7 +28,6 @@ class DiningTableController extends Controller
             $request->restaurant_id,
             $request->user_id
         ]);
-
         $data = Arr::except($request->validated(), ['user_id']);
 
         $diningTable = $this->diningTableRepository->create($data);
@@ -36,5 +35,23 @@ class DiningTableController extends Controller
         return response()->json($diningTable, 201);
     }
 
+    /** 
+     * Update the specified dining table in storage.
+     * @param DiningTableRequest $request
+     * @param int $diningTableId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(DiningTableRequest $request, DiningTable $diningTable)
+    {
+        Gate::authorize('update-dining-table', [
+            $diningTable->restaurant_id,
+            $request->user_id
+        ]);
+        $data = Arr::except($request->validated(), ['user_id']);
+
+        $updatedDiningTable = $this->diningTableRepository->update($diningTable, $data);
+
+        return response()->json($updatedDiningTable, 200);
+    }
     
 }

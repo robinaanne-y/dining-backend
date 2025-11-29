@@ -12,8 +12,15 @@ class DiningTableRepository implements DiningTableRepositoryInterface
         return DiningTable::create($data);
     }
 
+    public function update(DiningTable $diningTable, array $data): DiningTable
+    {
+        $diningTable->update($data);
+        return $diningTable;
+    }
+
     public function isOwner($user, $restaurantId): bool
     {
         return $user->restaurant()->where('id', $restaurantId)->exists();
     }
+    
 }

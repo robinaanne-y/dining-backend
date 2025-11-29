@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Restaurant;
+use App\Models\DiningTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -116,5 +117,122 @@ class DiningTableTest extends TestCase
             'restaurant_id' => $restaurant->id,
             'status' => 'available',
         ]); 
+    }
+
+    /** @test */
+    public function owner_can_update_dining_tables(): void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+
+        Sanctum::actingAs($owner, ['*']);
+
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'qr_token' => $qr = Str::uuid()->toString(),
+            'status' => 'available',
+        ]);
+
+        $updateResponse = $this->put("/api/dining-tables/{$diningTable->id}", [
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+            'user_id' => $owner->id,
+            'qr_token' => $qr,
+            'restaurant_id' => $restaurant->id,
+        ]);
+        
+        $updateResponse->assertStatus(200);
+        $this->assertDatabaseHas('dining_tables', [
+            'id' => $diningTable->id,
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+        ]);
+    }
+
+    /** @test */
+    public function non_owner_cannot_update_dining_tables(): void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $nonOwner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+        Sanctum::actingAs($nonOwner, ['*']);
+        $response = $this->put("/api/dining-tables/{$diningTable->id}", [
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+            'user_id' => $nonOwner->id,
+            'qr_token' => $diningTable->qr_token,
+            'restaurant_id' => $restaurant->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('dining_tables', [
+            'id' => $diningTable->id,
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+        ]);
+    }
+
+    /** @test */
+    public function unauthorized_cannot_update_dining_tables(): void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        $response = $this->putJson("/api/dining-tables/{$diningTable->id}", [
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+            'user_id' => $owner->id,
+            'qr_token' => $diningTable->qr_token,
+            'restaurant_id' => $restaurant->id,
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertDatabaseMissing('dining_tables', [
+            'id' => $diningTable->id,
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+        ]);
+    }
+
+    /** @test */
+    public function customer_cannot_update_dining_tables(): void
+    {
+        $customer = User::factory()->create(['user_type' => 'customer']);
+        $restaurant = Restaurant::factory()->create();
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($customer, ['*']);
+        $response = $this->put("/api/dining-tables/{$diningTable->id}", [
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+            'user_id' => $customer->id,
+            'qr_token' => $diningTable->qr_token,
+            'restaurant_id' => $restaurant->id,
+        ]);
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('dining_tables', [
+            'id' => $diningTable->id,
+            'table_number' => '2',
+            'seating_capacity' => 6,
+            'status' => 'occupied',
+        ]);
     }
 }

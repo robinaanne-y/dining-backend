@@ -21,4 +21,9 @@ class DiningTablePolicy
     {
         return ($this->diningTableRepository->isOwner($user, $restaurantId));
     }
+
+    public function update(User $user, int $restaurantId) : bool
+    {
+        return ($this->diningTableRepository->isOwner($user, $restaurantId));
+    }
 }
