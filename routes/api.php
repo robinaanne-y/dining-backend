@@ -45,6 +45,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('/menu-items/{menuItem}', [MenuItemController::class, 'destroy']);
     
     Route::post('/dining-tables', [DiningTableController::class, 'store']);
+    Route::put('/dining-tables/{diningTable}', [DiningTableController::class, 'update']);
 });
 
 Route::prefix('/customer')->group(function () {
