@@ -54,4 +54,20 @@ class DiningTableController extends Controller
         return response()->json($updatedDiningTable, 200);
     }
     
+    /** 
+     * Remove the specified dining table from storage.
+     * @param int $diningTableId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(DiningTable $diningTable)
+    {
+        Gate::authorize('delete-dining-table', [
+            $diningTable,
+            request()->user_id,
+        ]);
+
+        $diningTable->delete();
+
+        return response()->json(null, 200);
+    }
 }

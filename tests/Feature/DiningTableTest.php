@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Restaurant;
 use App\Models\DiningTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -233,6 +234,116 @@ class DiningTableTest extends TestCase
             'table_number' => '2',
             'seating_capacity' => 6,
             'status' => 'occupied',
+        ]);
+    }
+    
+    /** @test */
+    public function owner_can_delete_a_dining_table() : void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+
+        $response = $this->delete("/api/dining-tables/{$diningTable->id}", [
+            'user_id' => $owner->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('dining_tables', [
+            'id' => $diningTable->id,
+        ]);
+    }
+
+    /** @test */
+    public function non_owner_cannot_delete_a_dining_table() : void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $nonOwner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($nonOwner, ['*']);
+
+        $response = $this->delete("/api/dining-tables/{$diningTable->id}", [
+            'user_id' => $nonOwner->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('dining_tables', [
+            'id' => $diningTable->id,
+        ]);
+    }
+
+    public function unauthorized_user_cannot_delete_a_dining_table() : void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        $response = $this->deleteJson("/api/dining-tables/{$diningTable->id}", [
+            'user_id' => $owner->id,
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertDatabaseHas('dining_tables', [
+            'id' => $diningTable->id,
+        ]);
+    }
+
+    /** @test */
+    public function customer_cannot_delete_a_dining_table() : void
+    {
+        $customer = User::factory()->create(['user_type' => 'customer']);
+        $restaurant = Restaurant::factory()->create();
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        Sanctum::actingAs($customer, ['*']);
+
+        $response = $this->delete("/api/dining-tables/{$diningTable->id}", [
+            'user_id' => $customer->id,
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('dining_tables', [
+            'id' => $diningTable->id,
+        ]);
+    }
+
+    /** @test */
+    public function owner_cannot_delete_dining_table_with_orders() : void
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
+        $diningTable = DiningTable::factory()->create([
+            'restaurant_id' => $restaurant->id,
+            'status' => 'available',
+        ]);
+
+        $order = Order::factory()->create([
+            'dining_table_id' => $diningTable->id,
+        ]);
+
+        Sanctum::actingAs($owner, ['*']);
+        $response = $this->delete("/api/dining-tables/{$diningTable->id}", [
+            'user_id' => $owner->id,
+        ]);
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('dining_tables', [
+            'id' => $diningTable->id,
         ]);
     }
 }

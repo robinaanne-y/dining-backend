@@ -22,5 +22,9 @@ class DiningTableRepository implements DiningTableRepositoryInterface
     {
         return $user->restaurant()->where('id', $restaurantId)->exists();
     }
-    
+
+    public function hasOrders(DiningTable $diningTable) : bool
+    {
+        return $diningTable->orders()->exists();
+    }
 }

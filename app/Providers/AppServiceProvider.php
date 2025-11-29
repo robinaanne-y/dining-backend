@@ -56,5 +56,6 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('create-dining-table', [DiningTablePolicy::class, 'create']);
         Gate::define('update-dining-table', [DiningTablePolicy::class, 'update']);
+        Gate::define('delete-dining-table', [DiningTablePolicy::class, 'delete']);
     }
 }
