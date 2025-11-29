@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
+
+    public function diningTable()
+    {
+        return $this->belongsTo(DiningTable::class);
+    }
 }
