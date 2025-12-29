@@ -16,6 +16,17 @@ class OrderRepository implements OrderRepositoryInterface
         ]);
     }
 
+    public function update(array $data, Order $order): Order
+    {
+        $order->update($data);
+        return $order;
+    }
+
+    public function findById(int $orderId): Order
+    {
+        return Order::findOrFail($orderId);
+    }
+    
     public function updateTotalPrice(Order $order, float $totalPrice): Order
     {
         $order->total_price = $totalPrice;

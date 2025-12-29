@@ -6,7 +6,6 @@ use App\Repositories\OrderRepositoryInterface;
 use App\Repositories\DiningTableRepositoryInterface;
 use App\Repositories\OrderItemRepositoryInterface;
 use App\Repositories\MenuItemRepositoryInterface;
-
 use App\Http\Requests\OrderRequest;
 use Illuminate\Http\Request;
 
@@ -55,4 +54,14 @@ class OrderController extends Controller
 
         return response()->json($order, 201);
     }
+
+
+    public function update(Request $request, $orderId)
+    {
+        $order = $this->orderRepository->findById($orderId);
+        
+        $this->orderRepository->update($request->all(), $order);
+        return response()->json($order, 200);
+    }
+
 }

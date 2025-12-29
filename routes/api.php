@@ -48,6 +48,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/dining-tables', [DiningTableController::class, 'store']);
     Route::put('/dining-tables/{diningTable}', [DiningTableController::class, 'update']);
     Route::delete('/dining-tables/{diningTable}', [DiningTableController::class, 'destroy']);
+
+    Route::put('/orders/{order}', [OrderController::class, 'update']);
 });
 
 Route::prefix('/customer')->group(function () {
