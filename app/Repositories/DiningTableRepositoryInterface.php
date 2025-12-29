@@ -10,4 +10,5 @@ interface DiningTableRepositoryInterface
     public function update(DiningTable $diningTable, array $data) : DiningTable;
     public function isOwner($user, $restaurantId) : bool;
     public function hasOrders(DiningTable $diningTable) : bool;
+    public function getIdByQrToken(string $qrToken): int;
 }

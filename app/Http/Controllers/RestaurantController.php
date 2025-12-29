@@ -41,7 +41,6 @@ class RestaurantController extends Controller
      */
     public function store(RestaurantRequest $request)
     {
-
         Gate::authorize('create-restaurant', $this->userRepository->findById($request->user_id));
 
         $restaurant = $this->restaurantRepository->create($request->validated());

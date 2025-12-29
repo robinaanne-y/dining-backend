@@ -27,4 +27,10 @@ class DiningTableRepository implements DiningTableRepositoryInterface
     {
         return $diningTable->orders()->exists();
     }
+
+    public function getIdByQrToken(string $qrToken): int
+    {
+        $diningTable = DiningTable::where('qr_token', $qrToken)->firstOrFail();
+        return $diningTable->id;
+    }
 }

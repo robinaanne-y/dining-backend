@@ -23,4 +23,10 @@ class MenuItemRepository implements MenuItemRepositoryInterface
                         ->whereNotIn('status', ['inactive'])
                         ->get();
     }
+
+    public function getPriceById(int $menuItemId): float
+    {
+        $menuItem = MenuItem::findOrFail($menuItemId);
+        return $menuItem->price;
+    }
 }

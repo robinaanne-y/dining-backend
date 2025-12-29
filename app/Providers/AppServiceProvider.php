@@ -13,6 +13,10 @@ use App\Repositories\MenuItemRepository;
 use App\Repositories\MenuItemRepositoryInterface;
 use App\Repositories\DiningTableRepository;
 use App\Repositories\DiningTableRepositoryInterface;
+use App\Repositories\OrderRepository;
+use App\Repositories\OrderRepositoryInterface;
+use App\Repositories\OrderItemRepository;
+use App\Repositories\OrderItemRepositoryInterface;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
             RestaurantRepositoryInterface::class => RestaurantRepository::class,
             MenuItemRepositoryInterface::class => MenuItemRepository::class,
             DiningTableRepositoryInterface::class => DiningTableRepository::class,
+            OrderRepositoryInterface::class => OrderRepository::class,
+            OrderItemRepositoryInterface::class => OrderItemRepository::class,
         ];
 
         foreach ($bindings as $interface => $implementation) {
