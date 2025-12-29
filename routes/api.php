@@ -5,6 +5,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\DiningTableController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,9 +48,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/dining-tables', [DiningTableController::class, 'store']);
     Route::put('/dining-tables/{diningTable}', [DiningTableController::class, 'update']);
     Route::delete('/dining-tables/{diningTable}', [DiningTableController::class, 'destroy']);
+
+    Route::put('/orders/{order}', [OrderController::class, 'update']);
 });
 
 Route::prefix('/customer')->group(function () {
     // Route::get('/restaurants', [RestaurantController::class, 'customerIndex']);
     Route::get('/restaurants/{restaurant}/menu-items', [MenuItemController::class, 'customerIndex']);
+
+    Route::post('/restaurants/{restaurant}/orders', [OrderController::class, 'store']);
 });

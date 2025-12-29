@@ -24,7 +24,7 @@ class DiningTableController extends Controller
      */
     public function store(DiningTableRequest $request)
     {
-        Gate::authorize('create-dining-table', [
+        $this->authorize('create-dining-table', [
             $request->restaurant_id,
             $request->user_id
         ]);
@@ -43,7 +43,7 @@ class DiningTableController extends Controller
      */
     public function update(DiningTableRequest $request, DiningTable $diningTable)
     {
-        Gate::authorize('update-dining-table', [
+        $this->authorize('update-dining-table', [
             $diningTable->restaurant_id,
             $request->user_id
         ]);
@@ -61,7 +61,7 @@ class DiningTableController extends Controller
      */
     public function destroy(DiningTable $diningTable)
     {
-        Gate::authorize('delete-dining-table', [
+        $this->authorize('delete-dining-table', [
             $diningTable,
             request()->user_id,
         ]);

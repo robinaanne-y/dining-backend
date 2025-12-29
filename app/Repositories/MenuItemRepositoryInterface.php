@@ -9,4 +9,5 @@ interface MenuItemRepositoryInterface
     public function create(array $data): MenuItem;
     public function getAllFromRestaurant($restaurantId);
     public function getActiveFromRestaurant($restaurantId);
+    public function getPriceById(int $menuItemId): float;
 }
