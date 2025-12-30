@@ -111,6 +111,10 @@ For API testing (e.g., in Postman), use login endpoints to retrieve tokens and a
 | `/api/orders/{id}/status`                   | PUT    | Owner          | Update order status (owner)  |
 | `/api/tables`                               | GET    | Owner          | List restaurant tables       |
 | `/api/customer/restaurants/{id}/menu-items` | GET    | Customer       | Get active menu items        |
+| `/api/customer/restaurants/{id}/orders`     | POST   | Customer       | Customer can place orders    |
+| `/api/orders`                               | PUT    | Owner          | Update orders (status)       |
+| `/api/restaurant/{id}/orders`               | POST   | Owner          | Owner can place orders       |
+| `/api/customer/orders/{id}/add-items`       | PUT    | Customer       | Customer can add more orders |
 
 ---
 

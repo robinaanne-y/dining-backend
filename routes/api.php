@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/dining-tables/{diningTable}', [DiningTableController::class, 'update']);
     Route::delete('/dining-tables/{diningTable}', [DiningTableController::class, 'destroy']);
 
+    Route::post('/restaurants/{restaurant}/orders', [OrderController::class, 'store']);
     Route::put('/orders/{order}', [OrderController::class, 'update']);
 });
 
@@ -57,4 +58,6 @@ Route::prefix('/customer')->group(function () {
     Route::get('/restaurants/{restaurant}/menu-items', [MenuItemController::class, 'customerIndex']);
 
     Route::post('/restaurants/{restaurant}/orders', [OrderController::class, 'store']);
+
+    Route::put('/orders/{order}/add-items', [OrderController::class, 'addOrderItems']);
 });
