@@ -6,6 +6,12 @@ use App\Models\Order;
 
 class OrderRepository implements OrderRepositoryInterface
 {
+    
+    /** Create a new order
+     * @param array $data
+     * @param int $diningTableId
+     * @return Order
+     */
     public function create(array $data, int $diningTableId): Order
     {
         return Order::create([
@@ -16,20 +22,35 @@ class OrderRepository implements OrderRepositoryInterface
         ]);
     }
 
+    /** Update an existing order
+     * @param array $data
+     * @param Order $order
+     * @return Order
+     */
     public function update(array $data, Order $order): Order
     {
         $order->update($data);
         return $order;
     }
 
+    /** Find an order by its ID
+     * @param int $orderId
+     * @return Order
+     */
     public function findById(int $orderId): Order
     {
         return Order::findOrFail($orderId);
     }
-    
-    public function updateTotalPrice(Order $order, float $totalPrice): Order
+
+    /** Update the total price of an order
+     * @param Order $order
+     * @return Order
+     */
+    public function updateTotalPrice(Order $order): Order
     {
-        $order->total_price = $totalPrice;
+        $order->total_price = $order->orderItems->sum(function ($item) {
+            return $item->price;
+        });
         $order->save();
         return $order;
     }

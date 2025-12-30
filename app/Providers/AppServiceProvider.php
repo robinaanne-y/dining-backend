@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Policies\MenuItemPolicy;
 use App\Policies\RestaurantPolicy;
 use App\Policies\DiningTablePolicy;
+use App\Policies\OrderPolicy;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\RestaurantRepositoryInterface;
 use App\Repositories\UserRepository;
@@ -63,5 +64,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('create-dining-table', [DiningTablePolicy::class, 'create']);
         Gate::define('update-dining-table', [DiningTablePolicy::class, 'update']);
         Gate::define('delete-dining-table', [DiningTablePolicy::class, 'delete']);
+
+        Gate::define('create-order', [OrderPolicy::class, 'create']);
+        Gate::define('update-order', [OrderPolicy::class, 'update']);
+        Gate::define('add-order-item', [OrderPolicy::class, 'addOrderItem']);
     }
 }
