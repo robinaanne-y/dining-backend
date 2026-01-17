@@ -18,7 +18,7 @@ class UserLoginTest extends TestCase
             'password' => bcrypt('password'),
         ]);
 
-        $response = $this->post('/api/login', [
+        $response = $this->post('/api/admin/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
@@ -33,7 +33,7 @@ class UserLoginTest extends TestCase
             'password' => bcrypt('password'),
         ]);
 
-        $response = $this->post('/api/login', [
+        $response = $this->post('/api/admin/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
