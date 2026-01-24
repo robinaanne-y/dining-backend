@@ -30,14 +30,10 @@ class LoginController extends Controller
         }
         $user->tokens()->delete(); // Revoke all previous tokens
 
-        // Create a new token for the user
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $request->session()->regenerate();
 
-        
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user,
+            'user' => Auth::user()
         ]);
     }
 }
