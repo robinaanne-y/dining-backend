@@ -15,25 +15,27 @@ class RegisterOwnerTest extends TestCase
     /** @test */
     public function register_owner_returns_a_successful_response(): void
     {
-        $response = $this->post('/api/register', [
+        $response = $this->post('/register', [
             'name' => $this->faker->name(),
             'user_type' => 'owner',
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
+            'password_confirmation' => 'password',
         ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(204);
     }
 
      /** @test */
     public function register_owner_returns_a_failed_response(): void
     {
-        $response = $this->post('/api/register', [
+        $response = $this->post('/register', [
             'user_type' => 'owner',
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
+            'password_confirmation' => 'password',
         ], ['Accept' => 'application/json']);
 
         $response->assertStatus(422);

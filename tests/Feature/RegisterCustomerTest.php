@@ -14,18 +14,19 @@ class RegisterCustomerTest extends TestCase
     /** @test */
     public function register_customer_returns_a_successful_response(): void
     {
-        $response = $this->post('/api/register', [
+        $response = $this->post('/register', [
             'name' => $this->faker->name(),
             'user_type' => 'customer',
             'phone_number' => $this->faker->phoneNumber(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => $email=$this->faker->unique()->safeEmail(),
             'password' => 'password',
+            'password_confirmation' => 'password',
             'is_guest' => false,
-        ]);
+        ], ['Accept' => 'application/json']);
 
-        $response->assertStatus(201);
+        $response->assertStatus(204);
         $this->assertDatabaseHas('users', [
-            'email' => $response->json('user.email'),
+            'email' => $email,
             'user_type' => 'customer',
         ]);
     }
@@ -33,12 +34,13 @@ class RegisterCustomerTest extends TestCase
     /** @test */
     public function register_customer_returns_a_failed_response(): void
     {
-        $response = $this->post('/api/register', [
+        $response = $this->post('/register', [
             'name' => '',
             'user_type' => 'customer',
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
+            'password_confirmation' => 'password',
         ], ['Accept' => 'application/json']);
 
         $response->assertStatus(422);
@@ -47,18 +49,19 @@ class RegisterCustomerTest extends TestCase
     /** @test */
     public function register_customer_as_guest_returns_a_successful_response(): void
     {
-        $response = $this->post('/api/register', [
+        $response = $this->post('/register', [
             'name' => $this->faker->name(),
             'user_type' => 'customer',
             'phone_number' => $this->faker->phoneNumber(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => $email=$this->faker->unique()->safeEmail(),
             'password' => 'password',
+            'password_confirmation' => 'password',
             'is_guest' => true,
-        ]);
+        ], ['Accept' => 'application/json']);
 
-        $response->assertStatus(201);
+        $response->assertStatus(204);
         $this->assertDatabaseHas('users', [
-            'email' => $response->json('user.email'),
+            'email' => $email,
             'is_guest' => true,
         ]);
     }
