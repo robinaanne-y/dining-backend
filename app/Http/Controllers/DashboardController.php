@@ -48,7 +48,9 @@ class DashboardController extends Controller
                 'sales' => $total,
             ]);
         }
-
-        return response()->json($sales);
+        
+        return response()->json([
+            'sales' => $sales
+        ], 200);
     }
 }
