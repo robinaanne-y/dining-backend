@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Restaurant;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use App\Http\Requests\RegistrationRequest;
 
 class RegisteredUserController extends Controller
 {
@@ -18,16 +19,8 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): Response
+    public function store(RegistrationRequest $request): Response
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'user_type' => ['required', 'in:owner,customer'],
-            'phone_number' => ['required', 'string', 'max:20'],
-        ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -36,6 +29,13 @@ class RegisteredUserController extends Controller
             'phone_number' => $request->phone_number,
             'is_guest' => $request->boolean('is_guest', false),
         ]);
+
+        if ($request->user_type === 'owner') {
+            Restaurant::create([
+                'name' => $request->restaurant_name,
+                'user_id' => $user->id,
+            ]);
+        }
 
         event(new Registered($user));
 

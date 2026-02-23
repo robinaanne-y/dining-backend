@@ -16,6 +16,16 @@ class RestaurantRepository implements RestaurantRepositoryInterface
         return Restaurant::findOrFail($id);
     }
 
+    /**
+     * Find a restaurant by the user ID
+     * @param int $userId
+     * @return Restaurant|null
+     */
+    public function findByUserId(int $userId): ?Restaurant
+    {
+        return Restaurant::where('user_id', $userId)->first();
+    }
+
     /** Create a new restaurant
      * @param array $data
      * @return Restaurant

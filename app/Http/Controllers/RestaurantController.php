@@ -26,9 +26,10 @@ class RestaurantController extends Controller
      * @param Restaurant $restaurant
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Restaurant $restaurant)
+    public function show()
     {
-        Gate::authorize('view-restaurant', [$restaurant, $this->userRepository->findById(auth()->id())]);
+        $user = auth()->user();
+        $restaurant = $this->restaurantRepository->findByUserId($user->id);
         return response()->json($restaurant, 200);
     }
 

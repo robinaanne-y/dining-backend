@@ -18,6 +18,7 @@ class RegisterOwnerTest extends TestCase
         $response = $this->post('/register', [
             'name' => $this->faker->name(),
             'user_type' => 'owner',
+            'restaurant_name' => $this->faker->company(),
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
@@ -32,6 +33,7 @@ class RegisterOwnerTest extends TestCase
     {
         $response = $this->post('/register', [
             'user_type' => 'owner',
+            'restaurant_name' => $this->faker->company(),
             'phone_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 'password',
