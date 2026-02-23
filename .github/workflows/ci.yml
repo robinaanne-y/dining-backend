@@ -2,9 +2,9 @@ name: Laravel Tests
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ["master", "develop", "production"]
   pull_request:
-    branches: ["main", "dev"]
+    branches: ["master", "develop", "production"]
 
 jobs:
   tests:
