@@ -36,6 +36,8 @@ jobs:
       run: php artisan key:generate
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
+        DATABASE_NAME: testdb
+        DATABASE_USERNAME: root
         DATABASE_ENDPOINT: 127.0.0.1
         DATABASE_PASSWORD: testrootpass
       run: php artisan test
