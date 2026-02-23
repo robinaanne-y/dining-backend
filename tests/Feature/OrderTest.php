@@ -6,6 +6,7 @@ use App\Models\MenuItem;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\DiningTable;
+use App\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -313,5 +314,27 @@ class OrderTest extends TestCase
         $order = \App\Models\Order::first();
         $response->assertStatus(200);
         $this->assertEquals($expectedTotal, $order->total_price);
+    }
+
+    /** @test */
+    public function getSalesData()
+    {
+        $owner = User::factory()->create(['user_type' => 'owner']);
+        $restaurant = Restaurant::factory()->create([
+            'active' => true,
+            'user_id' => $owner->id]);
+            
+        $this->actingAs($owner, 'sanctum');
+
+        Order::factory()->count(5)->create([
+            'dining_table_id' => DiningTable::factory()->create(['restaurant_id' => $restaurant->id])->id,
+            'status' => 'completed',
+            'total_price' => 100,
+        ]);
+
+        $response = $this->getJson("/api/dashboard/sales");
+        
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['sales']);
     }
 }

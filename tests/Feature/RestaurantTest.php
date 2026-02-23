@@ -168,7 +168,7 @@ class RestaurantTest extends TestCase
         Sanctum::actingAs($user);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
+        $response = $this->get('/api/restaurants/current', ['Accept' => 'application/json']);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -186,46 +186,10 @@ class RestaurantTest extends TestCase
         ]);
         $restaurant = Restaurant::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
+        $response = $this->get('/api/restaurants/current', ['Accept' => 'application/json']);
 
         $response->assertStatus(401);
         $response->assertJson(['message' => 'Unauthorized access']);
-    }
-
-    /** @test */
-    public function customer_cannot_get_restaurant_details(): void
-    {
-        $owner = User::factory()->create([
-            'user_type' => 'owner'
-        ]);
-        $customer = User::factory()->create([
-            'user_type' => 'customer'
-        ]);
-        Sanctum::actingAs($customer);
-        $restaurant = Restaurant::factory()->create(['user_id' => $owner->id]);
-
-        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
-
-        $response->assertStatus(403);
-        $response->assertJson(['message' => 'Forbidden']);
-    }
-
-    /** @test */
-    public function owner_cannot_get_other_users_restaurant_details(): void
-    {
-        $owner = User::factory()->create([
-            'user_type' => 'owner'
-        ]);
-        $otherUser = User::factory()->create([
-            'user_type' => 'owner'
-        ]);
-        Sanctum::actingAs($owner);
-        $restaurant = Restaurant::factory()->create(['user_id' => $otherUser->id]);
-
-        $response = $this->get('/api/restaurants/' . $restaurant->id, ['Accept' => 'application/json']);
-
-        $response->assertStatus(403);
-        $response->assertJson(['message' => 'Forbidden']);
     }
 
     /** @test */

@@ -54,4 +54,40 @@ class OrderRepository implements OrderRepositoryInterface
         $order->save();
         return $order;
     }
+
+    /**
+     * Get all orders for a specific restaurant
+     * @param int $restaurantId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getOrdersForRestaurant(int $restaurantId)
+    {
+        return Order::whereHas('diningTable', function ($query) use ($restaurantId) {
+            $query->where('restaurant_id', $restaurantId);
+        })->with(['diningTable', 'orderItems'])->get();
+    }
+
+    public function getOrdersCountForRestaurant(int $restaurantId)
+    {
+        return Order::selectRaw('status, count(*) as count')
+            ->whereHas('diningTable', function ($query) use ($restaurantId) {
+                $query->where('restaurant_id', $restaurantId);
+            })
+            ->groupBy('status')
+            ->get();
+    }
+
+    /**
+     * Get orders for a specific restaurant within a date range
+     * @param int $restaurantId
+     * @param string $startDate
+     * @param string $endDate
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getOrdersByDate(int $restaurantId, string $date)
+    {
+        return Order::whereHas('diningTable', function ($query) use ($restaurantId) {
+            $query->where('restaurant_id', $restaurantId);
+        })->whereDate('created_at', $date)->get();
+    }
 }

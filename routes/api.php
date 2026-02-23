@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\DiningTableController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,7 +36,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/restaurants/{restaurant}', [RestaurantController::class, 'show']);
+    Route::get('/restaurants/current', [RestaurantController::class, 'show']);
     Route::post('/restaurants', [RestaurantController::class, 'store']);
     Route::put('/restaurants/{restaurant}', [RestaurantController::class, 'update']);
     Route::put('/restaurants/{restaurant}/deactivate', [RestaurantController::class, 'deactivate']);
@@ -51,6 +53,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/restaurants/{restaurant}/orders', [OrderController::class, 'store']);
     Route::put('/orders/{order}', [OrderController::class, 'update']);
+
+    Route::get('/dashboard/orders', [DashboardController::class, 'getOrders']);
+    Route::get('/dashboard/orders/count', [DashboardController::class, 'getOrdersCount']);
+    Route::get('dashboard/sales', [DashboardController::class, 'getSalesData']);
+
+    Route::get('/user', [UserController::class, 'getAuthUser']);
 });
 
 Route::prefix('/customer')->group(function () {
