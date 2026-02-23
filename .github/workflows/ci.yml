@@ -24,7 +24,6 @@ jobs:
       with:
         php-version: '8.1'
     - uses: actions/checkout@v4
-    - run: mysql -h 127.0.0.1 --port 3306 -u root -password -e 'CREATE DATABASE IF NOT EXISTS testdb;'
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Update Dependencies
@@ -39,6 +38,5 @@ jobs:
       env:
         DATABASE_NAME: testdb
         DATABASE_USERNAME: root
-        DATABASE_ENDPOINT: 127.0.0.1
         DATABASE_PASSWORD: testrootpass
       run: php artisan test
