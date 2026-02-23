@@ -331,7 +331,7 @@ class OrderTest extends TestCase
             'status' => 'completed',
             'total_price' => 100,
         ]);
-
+        
         $response = $this->getJson("/api/dashboard/sales");
         
         $response->assertStatus(200);
